@@ -1,0 +1,11 @@
+[Unit]
+Description=power-led: Keep led activated while running
+After=sysinit.target
+
+[Service]
+ExecStart=/usr/bin/sudo /usr/local/bin/power-led
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=sysinit.target

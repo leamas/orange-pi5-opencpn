@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+"""
+Simple tool to terminate a running opencpn instance using the dbus
+interface available from 5.9.0.
+
+Basically the same as "opencpn --remote --quit". However, it is much
+faster, works also on Flatpak instances and blocks until opencpn
+really is exited.
+
+opencpn-stop -h prints help summary.
+
+"""
+
+
+import argparse
+import dbus
+import sys
+
+from gi.repository import Gio
+from gi.repository import GLib
+
+
+def get_args():
+    """ Define and parse command line args, return parsed tuple. """
+    parser = argparse.ArgumentParser(prog='opencpn-stop',
+                                     description='Synchronously stop opencpn')
+    parser.add_argument("timeout", type=int, default=3, nargs='?',
+                        help='(seconds)')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help='Print verbose feedback')
+    args = parser.parse_args()
+    return args
+
+
+def opencpn_quit(args):
+    """ Send the Quit command over Dbus, exit if opencpn does not run. """
+    bus = dbus.SessionBus()
+    try:
+        object = bus.get_object('org.opencpn.OpenCPN', '/org/opencpn/OpenCPN')
+        dbus.Interface(object, 'opencpn.desktop').Quit()
+    except dbus.exceptions.DBusException:
+        if args.verbose:
+            print("opencpn: not running")
+        GLib.MainLoop().quit()
+        sys.exit(0)
+
+
+def wait_for_exit(args):
+    """ Run main loop and block until opencpn has exited. """
+
+    def on_name_acquired(connection, name, data):
+        if args.verbose:
+            print("opencpn: running")
+
+    def on_name_lost(connection, name):
+        if args.verbose:
+            print("opencpn: exited")
+        GLib.MainLoop().quit()
+        sys.exit(0)
+
+    def on_timeout():
+        if args.verbose:
+            print("opencpn: timeout")
+        GLib.MainLoop().quit()
+        sys.exit(1)
+
+    bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+    Gio.bus_watch_name_on_connection(bus, 'org.opencpn.OpenCPN', 0,
+                                     on_name_acquired, on_name_lost)
+    GLib.timeout_add_seconds(args.timeout, on_timeout)
+    GLib.MainLoop().run()
+
+
+if __name__ == '__main__':
+    args = get_args()
+    opencpn_quit(args)
+    wait_for_exit(args)
