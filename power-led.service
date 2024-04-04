@@ -8,4 +8,4 @@ Restart=always
 RestartSec=2
 
 [Install]
-WantedBy=sysinit.target
+WantedBy=default.target

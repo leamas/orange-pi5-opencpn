@@ -12,4 +12,4 @@ ExecStop=/usr/bin/sudo systemctl poweroff
 TimeoutStopSec=5
 
 [Install]
-WantedBy=sysinit.target
+WantedBy=default.target
