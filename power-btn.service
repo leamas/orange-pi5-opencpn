@@ -5,10 +5,11 @@ Description=Wait until power button is pushed and run poweroff
 Type=simple
 ExecStart=/usr/bin/sudo %h/bin/power-btn
 
-ExecStop=/usr/bin/sudo pkill power-btn
+ExecStop=-/usr/bin/sudo /usr/bin/pkill -f  %h/bin/power-btn
 ExecStop=%h/bin/opencpn-stop
 ExecStop=/usr/bin/bash -c "while pgrep power-btn > /dev/null; do sleep 1; done"
 ExecStop=/usr/bin/sudo systemctl poweroff
+TimeoutStopSec=5
 
 [Install]
 WantedBy=sysinit.target
