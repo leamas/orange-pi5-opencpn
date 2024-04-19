@@ -160,41 +160,35 @@ Initiate services:
 
 Remote desktop
 --------------
+gnome-remote-desktop: used to work all of a sudden broke, unable to find 
+a console. Eventually I just have up on it.
 
-Install the remote desktop package:
+Install packages:
 
-    # apt install gnome-remote-desktop
+    # apt install xrdp xorgxrdp
 
-In Gnome Settings (the gear) go to _Sharing_  and enable _Remote Desktop_
-This starts an RDP server on port 3389. This can be used by any RDP client,
-I use Remmina.
+Make sure /dev/tty0 is accessible. First create a new udev rule, save it
+as */etc/udev/rules.d/tty.rules*:
 
-This simple setup requires a monitor. When running headless, the monitor
-is replaced by the HDMI dummy  plug.
+    SUBSYSTEM=="tty", KERNEL=="tty[0-9]*", GROUP="tty", MODE="0660"
 
-Automatic start up
-------------------
+And add the group owning the /dev/tty0 to secondary groups:
 
-The user running OpenCPN should be logged in automatically. Edit
-_/etc/gdm3/daemon.conf_ and modify it to read (your user will be
-different...). As of today's date, Wayland does not work.
+    $ sudo usermod -aG tty $USER
 
-```
-[daemon]
-WaylandEnable=false
-AutomaticLoginEnable = true
-AutomaticLogin = al
+xrdp + Gnome does not make it, switch to xfxe4 instead. Sigh.
 
-```
+Add an **executable** file *~/.xsession* reading:
 
-To make OpenCPN start automatically do:
+    xfce4-session
 
-    $ test -d $HOME/.config/autostart || mkdir $HOME/.config/autostart
-    $ cp opencpn.desktop $HOME/.config/autostart
+Remove *~/.xinsitrc* if it exists. Start the xrdp service and connect
+with remmina.
 
-Automatic login means that the keyring password will no be available. The
-only work-around is to store keyring passwords unencrypted. Sigh.
+Opencpn autostart
+-----------------
 
-Do `sudo apt install seahorse` and start seahorse from the GUI. Right-click
-on the login keyring top-left and select password. Set the new password 
-to empty and save.
+Copy opencpn.desktop to */etc/xdg/autostart/org.opencpn.OpenCPN.desktop*. 
+Strange problem trying to use *~/.config/autostart*.
+
+
