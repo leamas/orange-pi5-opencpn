@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=OpenCPN
+Comment=Stop any running OpenCPN
+Exec=~/bin/opencpn-stop
+Icon=opencpn
+Terminal=false
+Type=Application
+Categories=Graphics;Geography;
+Keywords=GPS;Navigation;Chart;

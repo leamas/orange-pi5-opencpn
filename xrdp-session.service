@@ -1,0 +1,11 @@
+[Unit]
+Description=Start a xrdp session
+After=graphical.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash -c "/usr/bin/xrdp-sesrun -F 0 al </home/al/.config/pw.txt"
+
+
+[Install]
+WantedBy=graphical.target
