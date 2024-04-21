@@ -1,7 +1,8 @@
 TARGETS = power-btn power-led
 SCRIPTS = opencpn-stop
 SERVICES = power-btn.service power-led.service
-DESKTOP_APPS = org.opencpn.OpenCPN.desktop
+DESKTOP_APPS = org.opencpn.OpenCPN.desktop \
+	       opencpn-stop.desktop opencpn-poweroff.desktop
 
 SERVICE_DIR ?= $(HOME)/.config/systemd/user
 AUTOSTART_DIR ?= $(HOME)/.config/autostart

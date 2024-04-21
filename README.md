@@ -84,9 +84,9 @@ Change the orangepi default password
     # passwd orangepi
     ... answer prompts
 
-Install the gnome desktop
+Install the xfce4 desktop
 
-    # apt install task-gnome-desktop
+    # apt install xfce4
 
 Set the hostname
 
@@ -185,10 +185,14 @@ Add an **executable** file *~/.xsession* reading:
 Remove *~/.xinsitrc* if it exists. Start the xrdp service and connect
 with remmina.
 
-Opencpn autostart
------------------
+Configure autostart and "autostop"
+----------------------------------
 
-Copy opencpn.desktop to */etc/xdg/autostart/org.opencpn.OpenCPN.desktop*. 
-Strange problem trying to use *~/.config/autostart*.
+OpenCPN should be started as soon as the actual user is logged in. This 
+is handled by `make install` above.
 
-
+As for stopping OpenCPN, the script _opencpn_stop_ sends a exit signal
+to OpenCPN and waits until it really has exited. This is important to avoid
+the "Your last session seems to have failed" dialog when starting OpenCPN
+next time. Also this should be handled by `make install` which installs
+two desktop files handling logout and shutdown.
