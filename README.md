@@ -23,9 +23,6 @@ Hardware:
   - 4A power USB-C Power supplys, 220V for testing, 12V for yacht
     connection.
 
-  - A HDMI dummy plug which replaces the monitor when running in "real"
-    usage, for example https://www.amazon.se/dp/B06XT1Z9TF/
-
   - A bootstrap sd card, nothing fancy.  32GB is enough.
 
   - An short nvme SSD, I used https://www.amazon.se/dp/B0BTDPXWPC
@@ -38,7 +35,7 @@ For development
 
   - HDMI monitor
   - USB keyboard + mouse
-  - wired ethernet connection
+  - Wired ethernet connection
 
 
 Cooling and case
@@ -158,10 +155,16 @@ Initiate services:
 
     $ systemctl --user enable --now power-btn.service power-led.service
 
+Install system service initiatoing the session: We want the xrdp session to 
+start directly on boot rather than on first login. Edit the _xrdp-session.service_ file, it contains hardcoded user and home directory paths. Activate using:
+
+    $ sudo cp xrdp-session.service /etc/systemd/system
+    $ sudo systemctl enable --now xrdp-session.service
+
 Remote desktop
 --------------
 gnome-remote-desktop: used to work all of a sudden broke, unable to find 
-a console. Eventually I just have up on it.
+a console. Eventually,  I just have up on it. Sigh. Use xrdp instead.
 
 Install packages:
 
@@ -175,8 +178,6 @@ as */etc/udev/rules.d/tty.rules*:
 And add the group owning the /dev/tty0 to secondary groups:
 
     $ sudo usermod -aG tty $USER
-
-xrdp + Gnome does not make it, switch to xfxe4 instead. Sigh.
 
 Add an **executable** file *~/.xsession* reading:
 
