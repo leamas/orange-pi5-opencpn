@@ -1,0 +1,32 @@
+Goal: make internet accessible for SBC
+
+Configure laptop
+----------------
+
+Set fixed interface to 192.168.3.1
+Set route 192.68.3.0/24 dev whatever
+Enable forwarding
+
+Firewall-cmd:
+  default zone external
+  assign fixed interface to  zone internal
+  Add masquerade to internal 
+
+
+Configure SBC
+-------------
+
+Set wired interface to 192.168.3.2
+set route  192.168.3.0/24 dev whatever
+set route default via 192.168.3.1
+set connection dns to 8.8.8.8, shortcut by editing /etc/resolv.con
+
+
+Back to laptop
+--------------
+
+Reconnect wifi to internet
+ssh al@192.168.3.1...
+remmina, rdp, 192.168.3.2
+
+
