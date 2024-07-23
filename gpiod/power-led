@@ -1,0 +1,18 @@
+#!/usr/bin/python
+#
+# Helper script for power-led.service. Install into for example /usr/local/bin
+
+import gpiod
+import time
+import sys
+
+GPIO_LINE = sys.argv[1]
+
+chip=gpiod.Chip('gpiochip0')
+line = gpiod.find_line(GPIO_LINE)
+lines = chip.get_lines([line.offset()])
+lines.request(consumer='power-led', type=gpiod.LINE_REQ_DIR_OUT,
+              default_vals=[0])
+lines.set_values([1])
+
+while (True): time.sleep(100)

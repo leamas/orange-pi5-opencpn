@@ -1,0 +1,55 @@
+#!/usr/bin/python
+#
+# Wait for falling edge on sys.argv[1], run shutdown when it
+# arrives.
+#
+# Try hard to filter out events related to other lines than GPIO_LINE.
+
+
+import gpiod
+import time
+import subprocess
+import sys
+
+GPIO_LINE = sys.argv[1]
+
+def is_really_low(lines):
+    """Return True if lines[0] is kept low for 300 ms"""
+    for i in range(5):
+        time.sleep(0.06)
+        vals = lines.get_values()
+        if (vals[0] == 1):
+            return False;
+    return True
+
+def is_correct_line(line):
+    """Return True if line is correct and caused be a falling edge on it."""
+    return (line.name() == GPIO_LINE and
+            line.event_read().source.name() == GPIO_LINE)
+
+def kill_opencpn():
+    """Kill opencpn processes and wait until they exits."""
+    status = subprocess.run(["/usr/bin/pkill", "-f",
+                             "bin/opencpn|opencpn.sh|^opencpn$"])
+    done = status.returncode != 0
+    while not done:
+        time.sleep(0.1)
+        status = subprocess.run(["/usr/bin/pgrep", "-f",
+                                 "bin/opencpn|opencpn.sh|^opencpn$"])
+        done = status.returncode == 0
+
+
+with gpiod.Chip('gpiochip0') as chip: 
+    line = gpiod.find_line(GPIO_LINE)
+    lines = chip.get_lines([line.offset()])
+    lines.request(consumer='power-btn', type=gpiod.LINE_REQ_EV_FALLING_EDGE,
+                  flags=gpiod.LINE_REQ_FLAG_BIAS_PULL_UP)
+    while True:
+        ev_lines = lines.event_wait(sec=10)
+        if not ev_lines: 
+            continue
+        ev_lines = [l for l in ev_lines if is_correct_line(l)]
+        if ev_lines and is_really_low(lines):
+            print("Power off button detected -- halting system")
+            kill_opencpn()
+            subprocess.run(["/usr/sbin/shutdown", "-h", "now"])
