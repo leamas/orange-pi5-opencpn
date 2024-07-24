@@ -3,7 +3,7 @@
 
 This is a small, personal project where I run OpenCPN on an Orange Pi 5
 (OrPi5) SBC.
-This SBC is similar to Raspberry Pie 5, bit is more powerful, needs
+This SBC is similar to Raspberry Pie 5, but is more powerful, needs
 less current and is somewhat more expensive.
 
 The overall goal is configure the system to run continously without the 
@@ -33,7 +33,7 @@ At any point the PC lid can be opened and the current position on chart and
 active route is displayed.
 A tablet is also practical for plotting.
 
-image::planning.png[]
+image::plotting.png[]
 
 === Maintenance
 
@@ -86,7 +86,9 @@ version.
   - A waveshare L76X Multi-GNSS hat handling the GPS, 
     https://www.waveshare.com/l76x-gps-hat.htm.
     It comes with an antenna which works for indoor testing, but
-    for my yacht I use a Garmin GPS antenna mounted on the pushpit.
+    for my yacht I use a 
+    https://www.amazon.com/Garmin-GA-GPS-GLONASS-Antenna/dp/B072Q4C5LM/ref=sr_1_30[Garmin GPS antenna]
+    mounted on the pushpit.
     The card also needs a battery.
 
   - A TP-Link Archer T3U Plus USB wifi module,
@@ -103,3 +105,22 @@ version.
   - 40-pin raspberry connectors for soldering, female (for OrPi5) and
     male (for waveshare GPS card) like
     https://www.aliexpress.com/item/1005002833659269.html
+
+=== Starting OpenCPN
+
+OpenCPN is started when system is booted.
+This is done by dropping an _opencpn.desktop_ file in _~/.config/autostart/_
+An example desktop file can be found here.
+
+=== Stopping OpenCPN
+
+The SBC is stopped by pushing a hardware button.
+Pushing this button starts the _opencpn-stop_ script. 
+When this is completed the system is brought down using `shutdown`. 
+
+Bits and pieces:
+
+*  _power-btn.service_: A systemd service tracking the power off button.
+*  _power-btn_: Script used by the systemd service
+*  _opencpn-stop_: python script basically performing
+  `opencpn --remote --quit`, but "better" -- see comments in script.
