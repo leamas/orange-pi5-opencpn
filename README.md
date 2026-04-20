@@ -115,7 +115,7 @@ Set up the wlan, the OrPi5 is wlan AP:
     # nmcli con modify Hotspot wifi-sec.psk "veryveryhardpassword1234"
     # nmcli con up Hotspot
 
-Two problems occurs:
+Problems occurs:
 
 1. The wlan0 device does not exist. Look in dmesg for wlan0, this reveals that
    the kernel has renamed it to wlx98254a3b1d48  (!). The device name is also
@@ -125,6 +125,9 @@ Two problems occurs:
 2. The interface failed to activate due to using wrong wifi channels.
    Look in https://en.wikipedia.org/wiki/List_of_WLAN_channels and
    update Hotspot's `802-11-wireless.channel` property to a sane channel.
+
+3. Connection fails to start up due to missing dnsmasq. 
+   Fix: `apt install dnsmasq`
 
 Install OpenCPN
 ---------------
@@ -197,3 +200,45 @@ to OpenCPN and waits until it really has exited. This is important to avoid
 the "Your last session seems to have failed" dialog when starting OpenCPN
 next time. Also this should be handled by `make install` which installs
 two desktop files handling logout and shutdown.
+
+
+
+New notes: Armbian 26.2.1 noble
+-------------------------------
+Latest Armbian release has decent support for RK3588. Using Armbian is a 
+mostly breeze compared to the previous vendor stuff.
+
+*Remote Display*
+Remote display needs Wayland support. Can be set up using 
+
+   $ sudo apt install gnome-remote-desktop winpr-utils
+   $ sudo systemctl stop gnome-remote-desktop.service
+   $ RDP_USER="rdptestuser"
+   $ RDP_PASS="12345678"
+   $ mkdir -p ~/.local/share/gnome-remote-desktop
+   $ winpr-makecert -silent -rdp -y 2 -path ~/.local/share/gnome-remote-desktop/certificates rdp-tls
+   $ grdctl rdp enable
+   $ grdctl rdp disable-view-only
+   $ grdctl rdp set-credentials "${RDP_USER}" "${RDP_PASS}"
+   $ grdctl rdp set-tls-key ~/.local/share/gnome-remote-desktop/certificates/rdp-tls.key
+   $ grdctl rdp set-tls-cert ~/.local/share/gnome-remote-desktop/certificates/rdp-tls.crt
+   $ grdctl status --show-credentials
+   $ systemctl --user --now enable gnome-remote-desktop.service
+   $ systemctl --user status gnome-remote-desktop.service
+
+Client part:
+   $ sudo dnf -y install gnome-connections
+   $ gnome-connections rdp://host
+
+See: https://github.com/rustdesk/rustdesk/discussions/10016#discussioncomment-11757226
+
+Rustdesk is an alternative. However: https://github.com/rustdesk/rustdesk/discussions/10016
+
+*GPIO*
+
+libgpiod still doesnt seem to work, available tools is the wiringPi C interface
+distributed from vendor. It's a pain, but (barely) works.
+
+*USB-C port, "standing" third USB port*
+Contrary to the vendor kernel Armbian does not seem to support it (yet).
+
