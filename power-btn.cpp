@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
     state = digitalRead(ButtonPin);
     if (state != 0) continue;
 
-    std::cout << "Power button edge detected, going donw\n";
+    std::cout << "Power button edge detected, going down\n";
     exit(0);
   }
 }
