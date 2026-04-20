@@ -1,0 +1,9 @@
+[Unit]
+Description=Activate the wired-devel connection when button pushed
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sudo %h/bin/devel-btn
+
+[Install]
+WantedBy=default.target

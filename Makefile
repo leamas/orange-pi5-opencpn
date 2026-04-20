@@ -1,6 +1,6 @@
-TARGETS = power-btn power-led
+TARGETS = power-btn power-led devel-btn
 SCRIPTS = opencpn-stop
-SERVICES = power-btn.service power-led.service
+SERVICES = power-btn.service power-led.service devel-btn.service
 DESKTOP_APPS = org.opencpn.OpenCPN.desktop \
 	       opencpn-stop.desktop opencpn-poweroff.desktop
 
